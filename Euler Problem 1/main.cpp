@@ -12,6 +12,8 @@
 
 using namespace std;
 
+#define FINESSE
+
 /*
    Function to read and validate user input
    (help from http://stackoverflow.com/questions/4023895/how-to-read-string-entered-by-user-in-c/4023921#4023921)
@@ -49,13 +51,16 @@ static int getUserInputLine(char *prmpt, char *buff, size_t sz) {
 	return OK;
 }
 
+int solveByBruteForce(int input);
+
+int solveByCleverness(int input);
+
 int main(int argc, const char *argv[]) {
-	int input = 0;
+	
+    int userInput = 0;
 	char inputBuffer[7];
 	int inputResult = 0;
 
-	int multCountofThree = 0;
-	int multCountofFive = 0;
 	int sumMult = 0;
 
     printf("Please enter an integer value of less than 1,000,000. Enter return to accept a default of 1000: ");
@@ -80,34 +85,51 @@ int main(int argc, const char *argv[]) {
 		}
         
         if (inputResult == DEFAULT_INPUT) {
-            input = 1000;
+            userInput = 1000;
         }
         else
-            input = atoi(inputBuffer);
+            userInput = atoi(inputBuffer);
 	}
 	catch (exception &)
 	{
 		printf("\nSomething went wrong!  Please start over.");
 		return -1;
 	}
-
-	for (int index = 1; index <= input; index++) {
-		
-        if ((index%3) == 0) {
-            sumMult += index;
-            multCountofThree++;
-		}
-        
-        if ((index%5) == 0) {
-            sumMult += index;
-            multCountofFive++;
-        }
-        
-	}
+    
+#ifndef FINESSE
+    sumMult = solveByBruteForce(userInput);
+#else
+    sumMult = solveByCleverness(userInput);
+#endif
     
     printf("\n");
-    printf("There are %d multiples of three, and %d multiples of five in %d with a sum of %d\n",
-           multCountofThree, multCountofFive, input, sumMult);
+    printf("The sum of all the numbers less than %d with a factor of three or five is %d.\n", userInput, sumMult);
 
 	return 0;
+}
+
+
+int solveByBruteForce(int input)
+{
+    int sumMultiples = 0;
+    
+    for (int index = 1; index < input; index++) {
+        
+        if ((index%3 == 0) || (index%5 == 0)) {
+            sumMultiples += index;
+        }
+    }
+    
+    return sumMultiples;
+}
+
+int solveByCleverness(int input)
+{
+    input -= 1;
+    
+    int threeN = input/3;
+    int fiveN = input/5;
+    int fifteenN = input/15;
+    
+    return (3*threeN*(threeN + 1))/2 + (5*fiveN*(fiveN + 1))/2 - (15*fifteenN*(fifteenN + 1))/2;
 }
